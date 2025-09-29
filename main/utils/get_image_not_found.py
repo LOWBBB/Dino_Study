@@ -4,7 +4,8 @@ from PIL import Image
 import numpy as np
 
 # 原始文件名列表
-ranked_list = {'ashmolean_000078', 'ashmolean_000304', 'ashmolean_000269', 'ashmolean_000005', 'ashmolean_000052', 'ashmolean_000090', 'ashmolean_000274', 'ashmolean_000097', 'oxford_002745', 'radcliffe_camera_000478', 'ashmolean_000028'}
+ranked_list = \
+    {'ashmolean_000036', 'ashmolean_000005', 'radcliffe_camera_000478', 'ashmolean_000052'}
 
 # 添加.jpg后缀
 image_files = [f"{name}.jpg" for name in ranked_list]

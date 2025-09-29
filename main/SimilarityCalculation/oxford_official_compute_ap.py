@@ -175,7 +175,7 @@ if __name__ == "__main__":
         # 处理指定的主哈希键
         main_hash_key = "ashmolean_000000"  # 替换为实际的大主键名
         ranked_list = \
-            ['ashmolean_000000', 'oxford_001964', 'ashmolean_000303', 'ashmolean_000079', 'ashmolean_000002', 'ashmolean_000106', 'ashmolean_000305', 'ashmolean_000058', 'ashmolean_000007', 'oxford_002326', 'oxford_001485', 'oxford_001109', 'oxford_003077', 'oxford_002711', 'ashmolean_000316', 'ashmolean_000024', 'ashmolean_000301', 'ashmolean_000036', 'ashmolean_000016', 'oxford_000681', 'oxford_002172', 'oxford_000960', 'oxford_001935', 'ashmolean_000302', 'oxford_000638']
+            ['ashmolean_000000', 'ashmolean_000303', 'oxford_001964', 'ashmolean_000016', 'ashmolean_000002', 'ashmolean_000058', 'ashmolean_000106', 'ashmolean_000079', 'ashmolean_000007', 'ashmolean_000028', 'ashmolean_000305', 'ashmolean_000302', 'ashmolean_000090', 'ashmolean_000024', 'ashmolean_000269', 'ashmolean_000097', 'ashmolean_000274', 'ashmolean_000014', 'ashmolean_000078', 'oxford_002745', 'ashmolean_000003', 'ashmolean_000301', 'ashmolean_000192', 'ashmolean_000304', 'oxford_001870']
 
         result = processor.process_hash_to_sets(main_hash_key,ranked_list)
 

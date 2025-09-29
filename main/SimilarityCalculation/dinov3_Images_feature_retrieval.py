@@ -7,20 +7,16 @@ import os
 from main.utils import get_ipadress
 
 # 生成特征向量（适配DINOv3模型）
-def gen_image_features(processor, model, device, image):
+def gen_image_features(processor, model, device, images):
     with torch.no_grad():
-        # 处理图像输入
-        inputs = processor(images=image, return_tensors="pt").to(device)
+        # 处理批量图像输入
+        inputs = processor(images=images, return_tensors="pt").to(device)
         # DINOv3通过特征提取获取图像特征
         outputs = model(**inputs)
-        # 获取最后一层特征并进行平均池化
-        last_hidden_state = outputs.last_hidden_state
-        image_features = torch.mean(last_hidden_state, dim=1)
-        # L2归一化提升检索效果
-        image_features = image_features / image_features.norm(dim=-1, keepdim=True)
+        # 使用[CLS] token的输出作为图像特征，并归一化
+        features = outputs.last_hidden_state[:, 0, :].cpu().numpy()
         # 转换为numpy数组并确保类型为float32（Milvus要求）
-        return image_features.squeeze().cpu().numpy().astype('float32')
-
+        return features.astype('float32')
 
 def main():
     # 得到当前IP
@@ -37,13 +33,13 @@ def main():
     # 检索图像, 采用不在Milvus数据集中的图像
     image = Image.open("../data/oxford5k_query/ashmolean_000000.jpg")
     # 提取特征向量
-    features = gen_image_features(processor, model, device, image)
-
+    features = gen_image_features(processor, model, device, [image])
+    print("特征类型:", features.dtype)  # 应输出 float32
     # 特征召回（保持不变）
     limit_num = 25
     results = client.search(
         collection_name="oxford5k_raw_dinov3",  # 注意：需要确保该集合使用相同模型提取的特征
-        data=[features],
+        data=features,
         limit=limit_num,
         output_fields=["image_name"],
         search_params={
