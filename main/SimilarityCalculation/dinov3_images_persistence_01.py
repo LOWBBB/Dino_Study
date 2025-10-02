@@ -6,6 +6,25 @@ import torch
 import os
 from main.utils import get_ipadress
 
+# 配置参数集中管理
+CONFIG = {
+    # Milvus相关配置
+    "milvus_collection": "oxford5k_query_dinov3",
+    "milvus_host_func": get_ipadress.get_host_ip,
+    "milvus_port": "19530",
+
+    # 模型相关配置
+    "model_dir": "facebook/dinov3-vitb16-pretrain-lvd1689m",
+    "feature_dim": 768,  # dinov3-vitb16的特征维度
+
+    # 数据相关配置
+    "dataset_path": "../data/oxford5k_query",
+    "image_extensions": ('.png', '.jpg', '.jpeg', '.bmp', '.gif'),
+
+    # 处理参数配置
+    "batch_size": 32
+}
+
 
 # 批量生成特征向量（dinov3模型特征提取）
 def gen_batch_image_features(processor, model, device, images):
@@ -21,20 +40,19 @@ def gen_batch_image_features(processor, model, device, images):
 
 
 def main():
-    host_ip = get_ipadress.get_host_ip()
+    host_ip = CONFIG["milvus_host_func"]()
     # 创建Milvus客户端
-    client = MilvusClient(f"http://{host_ip}:19530")
-    # Milvus collection名
-    collection_name = "oxford5k_raw_dinov3"
+    client = MilvusClient(f"http://{host_ip}:{CONFIG['milvus_port']}")
+    collection_name = CONFIG["milvus_collection"]
 
-    # 检查并创建Milvus集合（dinov3-vitb16的特征维度为768）
+    # 检查并创建Milvus集合
     if not client.has_collection(collection_name=collection_name):
         client.create_collection(
             collection_name=collection_name,
             schema={
                 "fields": [
                     {"name": "id", "type": DataType.INT64, "is_primary": True, "auto_id": True},
-                    {"name": "vector", "type": DataType.FLOAT_VECTOR, "dim": 768},
+                    {"name": "vector", "type": DataType.FLOAT_VECTOR, "dim": CONFIG["feature_dim"]},
                     {"name": "image_name", "type": DataType.VARCHAR, "max_length": 256}
                 ]
             }
@@ -44,16 +62,15 @@ def main():
         print(f"Milvus集合已存在: {collection_name}")
 
     # 加载dinov3模型
-    model_dir = "facebook/dinov3-vitb16-pretrain-lvd1689m"  # 明确使用dinov3模型
-    processor = AutoImageProcessor.from_pretrained(model_dir)
-    model = AutoModel.from_pretrained(model_dir)
+    processor = AutoImageProcessor.from_pretrained(CONFIG["model_dir"])
+    model = AutoModel.from_pretrained(CONFIG["model_dir"])
     device = torch.device('cuda:0' if torch.cuda.is_available() else "cpu")
     model.to(device)
     model.eval()  # 设置为评估模式
     print(f"使用设备: {device}")
 
     # 读取数据集
-    dataset_path = "../data/oxford5k_raw"
+    dataset_path = CONFIG["dataset_path"]
     if not os.path.exists(dataset_path):
         print(f"数据集路径不存在: {dataset_path}")
         return
@@ -61,11 +78,11 @@ def main():
     # 获取所有图像文件路径
     image_files = []
     for image_name in os.listdir(dataset_path):
-        if image_name.lower().endswith(('.png', '.jpg', '.jpeg', '.bmp', '.gif')):
+        if image_name.lower().endswith(CONFIG["image_extensions"]):
             image_files.append(image_name)
 
     # 批量处理参数
-    batch_size = 32  # 可根据GPU内存大小调整
+    batch_size = CONFIG["batch_size"]
     total_batches = (len(image_files) + batch_size - 1) // batch_size
 
     # 批量处理图像并插入Milvus

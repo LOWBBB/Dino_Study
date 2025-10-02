@@ -14,9 +14,9 @@ def gen_image_features(processor, model, device, images):
         # DINOv3通过特征提取获取图像特征
         outputs = model(**inputs)
         # 使用[CLS] token的输出作为图像特征，并归一化
-        features = outputs.last_hidden_state[:, 0, :].cpu().numpy()
+        features = outputs.last_hidden_state[:, 0, :].cpu().numpy().astype('float32')
         # 转换为numpy数组并确保类型为float32（Milvus要求）
-        return features.astype('float32')
+        return features
 
 def main():
     # 得到当前IP
@@ -36,7 +36,7 @@ def main():
     features = gen_image_features(processor, model, device, [image])
     print("特征类型:", features.dtype)  # 应输出 float32
     # 特征召回（保持不变）
-    limit_num = 25
+    limit_num = 10
     results = client.search(
         collection_name="oxford5k_raw_dinov3",  # 注意：需要确保该集合使用相同模型提取的特征
         data=features,
@@ -68,3 +68,7 @@ def main():
 
 if __name__ == '__main__':
     main()
+
+
+
+
