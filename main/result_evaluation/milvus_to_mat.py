@@ -66,8 +66,8 @@ def replace_q_x_with_milvus_data(mat_file_path, output_file_path,
 
     # 5. 替换Q和X数据
     print("替换Q和X数据...")
-    data['Q'] = Q_new
-    data['X'] = X_new
+    data['Q'] = Q_new.T
+    data['X'] = X_new.T
 
     # 6. 保存修改后的文件
     print(f"保存到 {output_file_path}...")
@@ -86,7 +86,7 @@ def replace_q_x_with_milvus_data(mat_file_path, output_file_path,
 if __name__ == "__main__":
     # 替换为您的实际参数
     input_file = "../data/features/roxford5k_resnet_rsfm120k_gem.mat"
-    output_file = "../data/features/roxford5k_resnet_rsfm120k_gem_modified.mat"
+    output_file = "../data/features/roxford5k_resnet_rsfm120k_gem_modified001.mat"
 
     q_shape, x_shape = replace_q_x_with_milvus_data(
         mat_file_path=input_file,

@@ -1,0 +1,20 @@
+# Milvus相关配置
+milvus:
+  collection: "oxford5k_query_dinov3"
+  host_func: "get_host_ip"
+  host_module: "main.utils.get_ipadress"
+  port: "19530"
+
+# 模型相关配置
+model:
+  dir: "facebook/dinov3-vitb16-pretrain-lvd1689m"
+  feature_dim: 768  # dinov3-vitb16的特征维度
+
+# 数据相关配置
+data:
+  dataset_path: "../data/oxford5k_query"
+  image_extensions: ['.png', '.jpg', '.jpeg', '.bmp', '.gif']
+
+# 处理参数配置
+processing:
+  batch_size: 32

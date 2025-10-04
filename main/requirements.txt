@@ -1,0 +1,18 @@
+milvus
+    milvusdb/milvus:v2.3.1
+    zilliz/attu:v2.6 # milvus图形化界面
+
+pthon		3.12
+transformers	4.56.1
+torch		2.8.0
+pymilvus		2.6.1
+tqdm		4.67.1
+
+准备数据
+	gnd_roxford5k.pkl
+	查询集70张图片
+	数据集4993张图片
+	评估示例文件roxford5k_resnet_rsfm120k_gem.mat
+
+特征提取需要按照gnd文件中的imlist和qimlist顺序存入数据库，其中imlist是4993张图片的顺序，qimlist是70张查询图片的顺序。
+

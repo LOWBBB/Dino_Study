@@ -77,6 +77,7 @@ def compute_map(ranks, gnd, kappas=[]):
             qgndj = np.empty(0)
 
         # sorted positions of positive and junk images (0 based)
+        # 获取ranks第 i 列中那些存在于qgnd中的元素所在的行索引，保存到pos
         pos  = np.arange(ranks.shape[0])[np.in1d(ranks[:,i], qgnd)]
         junk = np.arange(ranks.shape[0])[np.in1d(ranks[:,i], qgndj)]
 

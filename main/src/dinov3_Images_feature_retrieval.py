@@ -6,6 +6,12 @@ import torch
 import os
 from main.utils import get_ipadress
 
+'''
+2025年10月4日15:25:33
+1.提取指定一张图片的特征，用这个特征到milvus数据库中进行特征召回得到相似度排名靠前的图片。
+2.对这些排名靠前的图片进行展示。
+'''
+
 # 生成特征向量（适配DINOv3模型）
 def gen_image_features(processor, model, device, images):
     with torch.no_grad():
@@ -13,9 +19,12 @@ def gen_image_features(processor, model, device, images):
         inputs = processor(images=images, return_tensors="pt").to(device)
         # DINOv3通过特征提取获取图像特征
         outputs = model(**inputs)
-        # 使用[CLS] token的输出作为图像特征，并归一化
-        features = outputs.last_hidden_state[:, 0, :].cpu().numpy().astype('float32')
+        # 使用[CLS] token的输出作为图像特征
+        cls_feat = outputs.last_hidden_state[:, 0, :]
+        # 增加L2归一化（在特征转换为numpy前执行）
+        normalized_feat = torch.nn.functional.normalize(cls_feat, p=2, dim=1)
         # 转换为numpy数组并确保类型为float32（Milvus要求）
+        features = normalized_feat.cpu().numpy().astype('float32')
         return features
 
 def main():
@@ -31,11 +40,11 @@ def main():
     device = torch.device('cuda:0' if torch.cuda.is_available() else "cpu")
     model.to(device)
     # 检索图像, 采用不在Milvus数据集中的图像
-    image = Image.open("../data/oxford5k_query/ashmolean_000000.jpg")
+    image = Image.open("../data/oxford5k_query/hertford_000082.jpg")
     # 提取特征向量
     features = gen_image_features(processor, model, device, [image])
     print("特征类型:", features.dtype)  # 应输出 float32
-    # 特征召回（保持不变）
+    # 特征召回10张图片（保持不变）
     limit_num = 10
     results = client.search(
         collection_name="oxford5k_raw_dinov3",  # 注意：需要确保该集合使用相同模型提取的特征

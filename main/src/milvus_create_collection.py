@@ -26,7 +26,7 @@ index_params.add_index(
 )
 # 创建 collection
 client.create_collection(
-    collection_name="oxford5k_raw_dinov3",
+    collection_name="oxford5k_query_dinov3",
     schema=schema,
     index_params=index_params
 )

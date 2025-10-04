@@ -2,6 +2,12 @@ from pymilvus import connections, Collection, utility
 import os
 from main.utils import get_ipadress
 from pymilvus import MilvusClient
+
+'''
+根据图片文件名image_name
+删除milvus中的数据
+'''
+
 # 1. 连接到Milvus服务（根据实际情况修改参数）
 
 host_ip = get_ipadress.get_host_ip()

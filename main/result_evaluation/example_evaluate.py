@@ -42,15 +42,17 @@ cfg = configdataset(test_dataset, os.path.join(data_root, 'datasets'))
 print('>> {}: Loading features...'.format(test_dataset))
 
 # 4993 = 5063 - 70 将70张查询图从raw里面摘出
-features = loadmat(os.path.join(data_root, 'features', '{}_resnet_rsfm120k_gem.mat'.format(test_dataset)))
+features = loadmat(os.path.join(data_root, 'features', '{}_resnet_rsfm120k_gem_modified001.mat'.format(test_dataset)))
 Q = features['Q']
 X = features['X']
-print(features)
 # perform search
 print('>> {}: Retrieval...'.format(test_dataset))
+
 sim = np.dot(X.T, Q) #原本的矩阵
-# sim = np.dot(X, Q.T)
+# 从qimlist的第一个开始 记录的数字是imlist中对应的那张图片
 ranks = np.argsort(-sim, axis=0)
+
+# print(ranks)
 
 # revisited evaluation
 gnd = cfg['gnd']
@@ -65,6 +67,7 @@ for i in range(len(gnd)):
     g['ok'] = np.concatenate([gnd[i]['easy']])
     g['junk'] = np.concatenate([gnd[i]['junk'], gnd[i]['hard']])
     gnd_t.append(g)
+# gnd_t 把gnd中的easy作为ok junk和hard作为junk加入到gnd_t中
 mapE, apsE, mprE, prsE = compute_map(ranks, gnd_t, ks)
 
 # search for easy & hard
@@ -87,4 +90,9 @@ mapH, apsH, mprH, prsH = compute_map(ranks, gnd_t, ks)
 
 print('>> {}: mAP E: {}, M: {}, H: {}'.format(test_dataset, np.around(mapE*100, decimals=2), np.around(mapM*100, decimals=2), np.around(mapH*100, decimals=2)))
 print('>> {}: mP@k{} E: {}, M: {}, H: {}'.format(test_dataset, np.array(ks), np.around(mprE*100, decimals=2), np.around(mprM*100, decimals=2), np.around(mprH*100, decimals=2)))
+
+
+
+
+
 
